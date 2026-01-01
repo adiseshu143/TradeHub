@@ -1,0 +1,270 @@
+/**
+ * FIRESTORE SECURITY RULES
+ * ========================
+ * 
+ * Copy these rules to Firebase Console > Firestore Database > Rules
+ * 
+ * Structure:
+ * 1. Public Collections (products, reviews, sellers)
+ *    - Public read access
+ *    - Authenticated users can write (with validation)
+ * 
+ * 2. User-Owned Collections (profiles, orders, cart, wishlists)
+ *    - Only owner can read/write their data
+ *    - Admin can read/write anything
+ * 
+ * 3. Admin Operations
+ *    - Restricted to users with admin role
+ *    - Can modify any document
+ */
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ========================================================================
+    // UTILITY FUNCTIONS
+    // ========================================================================
+
+    /**
+     * Check if user is authenticated
+     */
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    /**
+     * Check if user is the document owner
+     */
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    /**
+     * Get user's role from their profile
+     * Requires /users/{userId} to have a 'role' field
+     */
+    function getUserRole(userId) {
+      return get(/databases/$(database)/documents/users/$(userId)).data.role;
+    }
+
+    /**
+     * Check if user is admin
+     */
+    function isAdmin() {
+      return getUserRole(request.auth.uid) == 'admin';
+    }
+
+    /**
+     * Check if document has required fields
+     */
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    /**
+     * Validate string length
+     */
+    function isValidLength(field, min, max) {
+      return field.size() >= min && field.size() <= max;
+    }
+
+    /**
+     * Validate email format (basic)
+     */
+    function isValidEmail(email) {
+      return email.matches('.*@.*\\..+');
+    }
+
+    // ========================================================================
+    // PUBLIC COLLECTIONS (Read: Anyone, Write: Authenticated + Validation)
+    // ========================================================================
+
+    /**
+     * Products Collection
+     * Public read, authenticated write (sellers create products)
+     */
+    match /products/{productId} {
+      // Anyone can read products
+      allow read: if true;
+
+      // Only authenticated sellers can create/update products
+      allow create: if isAuthenticated() && hasRequiredFields(['name', 'price', 'category']);
+      
+      // Only product owner can update
+      allow update: if isAuthenticated() && isOwner(resource.data.sellerId);
+      
+      // Only product owner or admin can delete
+      allow delete: if isAuthenticated() && (isOwner(resource.data.sellerId) || isAdmin());
+    }
+
+    /**
+     * Reviews Collection
+     * Public read, authenticated write (users write reviews)
+     */
+    match /reviews/{reviewId} {
+      // Anyone can read reviews
+      allow read: if true;
+
+      // Authenticated users can create reviews
+      allow create: if isAuthenticated() && 
+                       hasRequiredFields(['userId', 'productId', 'rating', 'comment']) &&
+                       isOwner(request.resource.data.userId);
+      
+      // Only review author can update
+      allow update: if isAuthenticated() && isOwner(resource.data.userId);
+      
+      // Only review author or admin can delete
+      allow delete: if isAuthenticated() && (isOwner(resource.data.userId) || isAdmin());
+    }
+
+    // ========================================================================
+    // USER-OWNED COLLECTIONS (Read/Write: Owner Only or Admin)
+    // ========================================================================
+
+    /**
+     * User Profiles Collection
+     * Only owner or admin can read/write
+     * Profile created during signup
+     */
+    match /users/{userId} {
+      // User can read own profile or admin can read any
+      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
+
+      // User can update own profile
+      allow update: if isAuthenticated() && isOwner(userId) &&
+                       // Prevent non-admin from changing their own role
+                       (!request.resource.data.diff(resource.data).affectedKeys().contains('role') ||
+                        isAdmin());
+
+      // Creation handled by authService, prevent direct write
+      allow create: if false;
+      
+      // Only admin can delete
+      allow delete: if isAdmin();
+    }
+
+    /**
+     * Cart Collection
+     * Each user has a cart document
+     * Private: User can only access their own cart
+     */
+    match /users/{userId}/cart/{cartItemId} {
+      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      allow create: if isAuthenticated() && isOwner(userId);
+      allow update: if isAuthenticated() && isOwner(userId);
+      allow delete: if isAuthenticated() && (isOwner(userId) || isAdmin());
+    }
+
+    /**
+     * Wishlist Collection
+     * Each user can have wishlist items
+     */
+    match /wishlists/{wishlistId} {
+      allow read: if isAuthenticated() && (isOwner(resource.data.userId) || isAdmin());
+      allow create: if isAuthenticated() && 
+                       isOwner(request.resource.data.userId) &&
+                       hasRequiredFields(['userId', 'productId']);
+      allow update: if isAuthenticated() && (isOwner(resource.data.userId) || isAdmin());
+      allow delete: if isAuthenticated() && (isOwner(resource.data.userId) || isAdmin());
+    }
+
+    /**
+     * Orders Collection
+     * Each user's orders are private
+     * Format: orders/{orderId}
+     */
+    match /orders/{orderId} {
+      // User can read their own orders
+      allow read: if isAuthenticated() && (isOwner(resource.data.userId) || isAdmin());
+
+      // Users create their own orders
+      allow create: if isAuthenticated() && 
+                       isOwner(request.resource.data.userId) &&
+                       hasRequiredFields(['userId', 'items', 'totalPrice', 'status']);
+
+      // User can update own order status (for cancellation, etc.)
+      // Admin can update any order
+      allow update: if isAuthenticated() && 
+                       (isOwner(resource.data.userId) || isAdmin());
+
+      // Only admin can delete orders
+      allow delete: if isAdmin();
+
+      /**
+       * Order Items Subcollection
+       * Inherit parent document permissions
+       */
+      match /items/{itemId} {
+        allow read: if isAuthenticated() && 
+                       (isOwner(get(/databases/$(database)/documents/orders/$(orderId)).data.userId) || isAdmin());
+        allow write: if isAuthenticated() && isAdmin();
+      }
+    }
+
+    // ========================================================================
+    // ADMIN-ONLY COLLECTIONS
+    // ========================================================================
+
+    /**
+     * Analytics Collection
+     * Only admin can access
+     */
+    match /analytics/{document=**} {
+      allow read, write: if isAdmin();
+    }
+
+    /**
+     * Audit Logs Collection
+     * Only admin can read
+     */
+    match /auditLogs/{logId} {
+      allow read: if isAdmin();
+      allow write: if false; // Prevent direct writes, use Cloud Functions
+    }
+
+    // ========================================================================
+    // DENY ALL BY DEFAULT
+    // ========================================================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+/**
+ * IMPORTANT NOTES FOR DEPLOYMENT
+ * ===============================
+ * 
+ * 1. Composite Indexes
+ *    Firestore will automatically suggest creating composite indexes
+ *    when you try queries that require them.
+ *    
+ *    Common indexes needed:
+ *    - products: [category, price, createdAt]
+ *    - orders: [userId, createdAt]
+ *    - reviews: [productId, createdAt]
+ *    
+ *    These will be suggested in Firebase Console > Firestore > Indexes
+ * 
+ * 2. Role-Based Access
+ *    Users must have a 'role' field in /users/{userId}
+ *    Default: 'user'
+ *    Admin: 'admin'
+ * 
+ * 3. Server Timestamps
+ *    Always use serverTimestamp() in client code
+ *    Never trust client timestamps
+ * 
+ * 4. Testing Rules
+ *    Use Firebase Emulator Suite for local testing
+ *    firebase emulate
+ * 
+ * 5. Production Checklist
+ *    [ ] All collections have rules defined
+ *    [ ] Default deny rule at end
+ *    [ ] Admin routes require role check
+ *    [ ] User-owned data uses isOwner() check
+ *    [ ] Composite indexes created
+ *    [ ] Rules tested with Firebase Emulator
+ */

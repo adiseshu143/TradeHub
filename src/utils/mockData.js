@@ -1,0 +1,307 @@
+export const categories = [
+  { id: 'all', name: 'All', icon: '✨' },
+  { id: 'laptops', name: 'Laptops', icon: '💻' },
+  { id: 'audio', name: 'Audio', icon: '🎧' },
+  { id: 'smart-home', name: 'Smart Home', icon: '🏠' },
+  { id: 'gaming', name: 'Gaming', icon: '🎮' },
+  { id: 'fitness', name: 'Fitness', icon: '🏃' },
+];
+
+export const products = [
+  {
+    id: 'p-1',
+    name: 'Aurora X1 Ultrabook 14"',
+    category: 'Laptops',
+    price: 1199,
+    originalPrice: 1399,
+    rating: 4.8,
+    reviews: 326,
+    seller: 'Nebula Tech',
+    inStock: true,
+    image: 'https://images.pexels.com/photos/7974/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=800',
+    description: 'Featherweight aluminum body, 12-core CPU, all-day battery, and a color-accurate 3K display.',
+    highlights: ['3K Retina display', '18h battery', 'Thunderbolt 4'],
+    specs: { storage: '1TB NVMe', ram: '16GB LPDDR5', gpu: 'Iris Xe' },
+    sellers: [
+      { name: 'Nebula Tech', price: 1199, rating: 4.9, deliveryTime: '2-day delivery' },
+      { name: 'Byte Bazaar', price: 1229, rating: 4.7, deliveryTime: '3-4 days' }
+    ],
+  },
+  {
+    id: 'p-2',
+    name: 'Pulse ANC Wireless Headphones',
+    category: 'Audio',
+    price: 249,
+    originalPrice: 299,
+    rating: 4.6,
+    reviews: 198,
+    seller: 'Sonic Studio',
+    inStock: true,
+    image: 'https://images.pexels.com/photos/3587478/pexels-photo-3587478.jpeg?auto=compress&cs=tinysrgb&w=800',
+    description: 'Hybrid noise-cancelling with studio-grade drivers, spatial audio, and 40h battery.',
+    highlights: ['Hybrid ANC', 'Spatial audio', '40h battery'],
+    specs: { codec: 'LDAC / AAC', mics: '6 beamforming', charging: 'USB-C fast charge' },
+    sellers: [
+      { name: 'Sonic Studio', price: 249, rating: 4.6, deliveryTime: 'Tomorrow' },
+      { name: 'Prime Audio', price: 259, rating: 4.5, deliveryTime: '2-3 days' }
+    ],
+  },
+  {
+    id: 'p-3',
+    name: 'Halo Smart Lamp S3',
+    category: 'Smart Home',
+    price: 129,
+    originalPrice: 169,
+    rating: 4.7,
+    reviews: 142,
+    seller: 'Glow Living',
+    inStock: true,
+    image: 'https://images.pexels.com/photos/1112598/pexels-photo-1112598.jpeg?auto=compress&cs=tinysrgb&w=800',
+    description: 'Adaptive lighting with sunrise alarms, ambient sensors, and Matter compatibility.',
+    highlights: ['Matter-ready', 'Sunrise routine', 'Ambient light sensor'],
+    specs: { assistant: 'Alexa / Home / Siri', power: 'USB-C', color: '16M colors' },
+    sellers: [
+      { name: 'Glow Living', price: 129, rating: 4.7, deliveryTime: '2-day delivery' },
+      { name: 'Haven Home', price: 139, rating: 4.6, deliveryTime: '4 days' }
+    ],
+  },
+  {
+    id: 'p-4',
+    name: 'Vertex Pro Gaming Mouse',
+    category: 'Gaming',
+    price: 89,
+    originalPrice: 119,
+    rating: 4.5,
+    reviews: 512,
+    seller: 'Arcade Lab',
+    inStock: true,
+    image: 'https://images.pexels.com/photos/2115257/pexels-photo-2115257.jpeg?auto=compress&cs=tinysrgb&w=800',
+    description: '71g ultralight shell, 26K DPI sensor, and low-latency wireless with RGB edge glow.',
+    highlights: ['71g ultralight', 'Hot-swap skates', 'Dual wireless'],
+    specs: { sensor: '26K DPI', battery: '90h', switches: 'Optical V3' },
+    sellers: [
+      { name: 'Arcade Lab', price: 89, rating: 4.5, deliveryTime: 'Tomorrow' },
+      { name: 'Game Forge', price: 94, rating: 4.4, deliveryTime: '3 days' }
+    ],
+  },
+  {
+    id: 'p-5',
+    name: 'FlowForm Adjustable Standing Desk',
+    category: 'Smart Home',
+    price: 699,
+    originalPrice: 899,
+    rating: 4.9,
+    reviews: 204,
+    seller: 'North Studio',
+    inStock: true,
+    image: 'https://images.pexels.com/photos/667838/pexels-photo-667838.jpeg?auto=compress&cs=tinysrgb&w=800',
+    description: 'Dual motors, memory presets, cable management, and bamboo top with soft edges.',
+    highlights: ['Dual motors', 'Anti-collision', 'Memory presets'],
+    specs: { width: '60"', heightRange: '24"-50"', load: '275 lbs' },
+    sellers: [
+      { name: 'North Studio', price: 699, rating: 4.9, deliveryTime: 'Scheduled' },
+      { name: 'DeskHub', price: 729, rating: 4.7, deliveryTime: '3-5 days' }
+    ],
+  },
+  {
+    id: 'p-6',
+    name: 'Strata Mechanical Keyboard 75%',
+    category: 'Gaming',
+    price: 189,
+    originalPrice: 229,
+    rating: 4.6,
+    reviews: 265,
+    seller: 'Keebsmith',
+    inStock: false,
+    image: 'https://images.pexels.com/photos/1772123/pexels-photo-1772123.jpeg?auto=compress&cs=tinysrgb&w=800',
+    description: 'Gasket mount, PBT keycaps, per-key RGB, hotswap PCB, and tri-mode connectivity.',
+    highlights: ['Gasket mount', 'Hotswap PCB', 'Tri-mode wireless'],
+    specs: { layout: '75%', battery: '4000mAh', plate: 'PC' },
+    sellers: [
+      { name: 'Keebsmith', price: 189, rating: 4.6, deliveryTime: 'Restocking' },
+      { name: 'Click Club', price: 199, rating: 4.5, deliveryTime: '5 days' }
+    ],
+  },
+  {
+    id: 'p-7',
+    name: 'Orbit 4K Creator Webcam',
+    category: 'Smart Home',
+    price: 179,
+    originalPrice: 229,
+    rating: 4.4,
+    reviews: 134,
+    seller: 'StreamOne',
+    inStock: true,
+    image: 'https://images.pexels.com/photos/4065906/pexels-photo-4065906.jpeg?auto=compress&cs=tinysrgb&w=800',
+    description: '4K HDR sensor, AI framing, dual noise-cancelling mics, and magnetic privacy cap.',
+    highlights: ['4K HDR', 'AI framing', 'Dual mics'],
+    specs: { connection: 'USB-C', fov: '90°', mount: 'Magnetic' },
+    sellers: [
+      { name: 'StreamOne', price: 179, rating: 4.4, deliveryTime: '2 days' },
+      { name: 'Creator Lab', price: 189, rating: 4.3, deliveryTime: '3-4 days' }
+    ],
+  },
+  {
+    id: 'p-8',
+    name: 'AeroFit Pro Smartwatch',
+    category: 'Fitness',
+    price: 329,
+    originalPrice: 379,
+    rating: 4.7,
+    reviews: 401,
+    seller: 'Pulse Labs',
+    inStock: true,
+    image: 'https://images.pexels.com/photos/393047/pexels-photo-393047.jpeg?auto=compress&cs=tinysrgb&w=800',
+    description: 'Titanium case, AMOLED display, ECG, VO2 max, dual-band GPS, and 10-day battery.',
+    highlights: ['ECG + SpO2', 'Dual-band GPS', '10-day battery'],
+    specs: { water: '5ATM', display: '1.6" AMOLED', battery: '10 days' },
+    sellers: [
+      { name: 'Pulse Labs', price: 329, rating: 4.7, deliveryTime: 'Tomorrow' },
+      { name: 'Fit Outlet', price: 339, rating: 4.6, deliveryTime: '2-3 days' }
+    ],
+  },
+  {
+    id: 'p-9',
+    name: 'Nimbus Air True Wireless',
+    category: 'Audio',
+    price: 149,
+    originalPrice: 179,
+    rating: 4.3,
+    reviews: 287,
+    seller: 'Nimbus Audio',
+    inStock: true,
+    image: 'https://images.pexels.com/photos/8000575/pexels-photo-8000575.jpeg?auto=compress&cs=tinysrgb&w=800',
+    description: 'Featherlight ANC earbuds with multipoint, wireless charging, and transparency mode.',
+    highlights: ['Featherlight 3.9g', 'Multipoint', 'Qi wireless case'],
+    specs: { battery: '36h total', codec: 'AAC / aptX', noise: 'Hybrid ANC' },
+    sellers: [
+      { name: 'Nimbus Audio', price: 149, rating: 4.3, deliveryTime: 'Tomorrow' },
+      { name: 'AudioBay', price: 159, rating: 4.2, deliveryTime: '2-3 days' }
+    ],
+  },
+  {
+    id: 'p-10',
+    name: 'Horizon 27" QHD Monitor',
+    category: 'Gaming',
+    price: 369,
+    originalPrice: 449,
+    rating: 4.5,
+    reviews: 188,
+    seller: 'Visionary',
+    inStock: true,
+    image: 'https://images.pexels.com/photos/2582937/pexels-photo-2582937.jpeg?auto=compress&cs=tinysrgb&w=800',
+    description: '165Hz QHD IPS with 1ms response, USB-C power delivery, and factory calibration.',
+    highlights: ['165Hz QHD', 'USB-C 90W', 'Delta E < 2'],
+    specs: { size: '27" IPS', refresh: '165Hz', ports: 'USB-C, DP, HDMI' },
+    sellers: [
+      { name: 'Visionary', price: 369, rating: 4.5, deliveryTime: '2 days' },
+      { name: 'Pixel House', price: 389, rating: 4.4, deliveryTime: '3-4 days' }
+    ],
+  },
+  {
+    id: 'p-11',
+    name: 'EchoMove Mini Projector',
+    category: 'Smart Home',
+    price: 289,
+    originalPrice: 349,
+    rating: 4.4,
+    reviews: 156,
+    seller: 'CineBeam',
+    inStock: true,
+    image: 'https://images.pexels.com/photos/2774556/pexels-photo-2774556.jpeg?auto=compress&cs=tinysrgb&w=800',
+    description: 'Portable 1080p projector with auto-keystone, Wi‑Fi 6 streaming, and 6h battery.',
+    highlights: ['Auto focus', 'Wi‑Fi 6', '6h battery'],
+    specs: { resolution: '1080p', brightness: '700 ANSI', weight: '1.2lbs' },
+    sellers: [
+      { name: 'CineBeam', price: 289, rating: 4.4, deliveryTime: '2-3 days' },
+      { name: 'Beam Store', price: 299, rating: 4.3, deliveryTime: '4 days' }
+    ],
+  },
+  {
+    id: 'p-12',
+    name: 'CoreFlex Massage Gun',
+    category: 'Fitness',
+    price: 169,
+    originalPrice: 219,
+    rating: 4.5,
+    reviews: 243,
+    seller: 'RecoverX',
+    inStock: true,
+    image: 'https://images.pexels.com/photos/6551415/pexels-photo-6551415.jpeg?auto=compress&cs=tinysrgb&w=800',
+    description: 'Whisper-quiet motor, 6 attachments, pressure sensor, and travel-ready case.',
+    highlights: ['Quiet 35dB', 'Pressure sensor', 'USB-C fast charge'],
+    specs: { battery: '4h', speed: '5 modes', weight: '1.8lbs' },
+    sellers: [
+      { name: 'RecoverX', price: 169, rating: 4.5, deliveryTime: 'Tomorrow' },
+      { name: 'Wellness Pro', price: 175, rating: 4.4, deliveryTime: '3 days' }
+    ],
+  },
+];
+
+export const featuredCollections = [
+  {
+    id: 'c-1',
+    title: 'Desk setups that flow',
+    description: 'Curated picks to make hybrid work feel intentional and calm.',
+    accent: '#3f7aff',
+  },
+  {
+    id: 'c-2',
+    title: 'Sound you can feel',
+    description: 'From ANC cans to pocketable buds built for deep focus.',
+    accent: '#f59e0b',
+  },
+  {
+    id: 'c-3',
+    title: 'Movement made simple',
+    description: 'Wearables and recovery tools that coach you along the way.',
+    accent: '#22c55e',
+  },
+];
+
+export const testimonials = [
+  {
+    id: 't-1',
+    quote: 'TradeHub nails the balance of design, speed, and reliability. Everything ships faster than I expect.',
+    name: 'Camila R.',
+    role: 'Product Designer',
+  },
+  {
+    id: 't-2',
+    quote: 'The seller comparison is gold—I never overpay and I still get quick delivery.',
+    name: 'Jordan M.',
+    role: 'Video Creator',
+  },
+];
+
+export const mockUser = {
+  id: 'u-1',
+  name: 'Alex Carter',
+  email: 'alex.carter@example.com',
+  avatar: 'https://images.pexels.com/photos/91227/pexels-photo-91227.jpeg?auto=compress&cs=tinysrgb&w=400',
+  location: 'Brooklyn, NY',
+  loyalty: 'Gold',
+};
+
+export const mockOrders = [
+  {
+    id: 'ORD-2024-118',
+    status: 'shipped',
+    placedAt: '2024-11-28',
+    eta: '2024-12-03',
+    total: 369,
+    items: [products[9], products[2]],
+    carrier: 'UPS',
+    tracking: '1Z8923KDN',
+  },
+  {
+    id: 'ORD-2024-097',
+    status: 'delivered',
+    placedAt: '2024-10-12',
+    eta: '2024-10-17',
+    total: 249,
+    items: [products[1]],
+    carrier: 'FedEx',
+    tracking: '78234HQD9',
+  },
+];
