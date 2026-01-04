@@ -13,52 +13,70 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { getAnalytics, isSupported } from "firebase/analytics";
 
-// Validate required environment variables
-const requiredEnv = [
-  "VITE_FIREBASE_API_KEY",
-  "VITE_FIREBASE_AUTH_DOMAIN",
-  "VITE_FIREBASE_PROJECT_ID",
-  "VITE_FIREBASE_STORAGE_BUCKET",
-  "VITE_FIREBASE_MESSAGING_SENDER_ID",
-  "VITE_FIREBASE_APP_ID",
-];
+// Check if Firebase is configured
+const isFirebaseConfigured = import.meta.env.VITE_FIREBASE_API_KEY && 
+  import.meta.env.VITE_FIREBASE_PROJECT_ID;
 
-requiredEnv.forEach((env) => {
-  if (!import.meta.env[env]) {
-    console.warn(`⚠️ Missing environment variable: ${env}`);
-  }
+// Mock Firebase services for demo mode
+const createMockAuth = () => ({
+  currentUser: null,
+  onAuthStateChanged: () => () => {},
+  signInWithEmailAndPassword: () => Promise.resolve({ user: { uid: 'demo-user', email: 'demo@tradehub.com' } }),
+  createUserWithEmailAndPassword: () => Promise.resolve({ user: { uid: 'demo-user', email: 'demo@tradehub.com' } }),
+  signOut: () => Promise.resolve(),
 });
 
-// Firebase configuration from environment variables
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
-};
+const createMockDb = () => ({
+  collection: () => ({}),
+});
 
-// Initialize Firebase (singleton pattern)
-const app = initializeApp(firebaseConfig);
+const createMockStorage = () => ({
+  ref: () => ({}),
+});
 
-// Initialize Firebase services
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const storage = getStorage(app);
+let auth, db, storage, analytics, app;
 
-// Initialize Analytics only if supported (not in SSR/Node.js environments)
-let analytics = null;
-if (typeof window !== "undefined") {
-  isSupported().then((supported) => {
-    if (supported) {
-      analytics = getAnalytics(app);
-    }
-  });
+if (isFirebaseConfigured) {
+  // Firebase configuration from environment variables
+  const firebaseConfig = {
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID,
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+  };
+
+  // Initialize Firebase (singleton pattern)
+  app = initializeApp(firebaseConfig);
+
+  // Initialize Firebase services
+  auth = getAuth(app);
+  db = getFirestore(app);
+  storage = getStorage(app);
+
+  // Initialize Analytics only if supported (not in SSR/Node.js environments)
+  if (typeof window !== "undefined") {
+    isSupported().then((supported) => {
+      if (supported) {
+        analytics = getAnalytics(app);
+      }
+    }).catch(() => {
+      // Analytics not supported, silently ignore
+    });
+  }
+} else {
+  // Use mock services for demo mode
+  console.info('🔧 Firebase not configured - running in demo mode with mock data');
+  auth = createMockAuth();
+  db = createMockDb();
+  storage = createMockStorage();
+  analytics = null;
 }
 
-export { app, analytics };
+// Export Firebase services
+export { app, auth, db, storage, analytics };
 
 // Optional: Enable offline persistence (useful for mobile-like experiences)
 // ⚠️ Note: Enables local caching, but requires careful sync handling
