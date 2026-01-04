@@ -4,10 +4,11 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { ShoppingBag, ShoppingCart, Heart, User, Sparkles, Menu, X, Search } from 'lucide-react'
 import Footer from './components/layout/Footer'
 import MobileNav from './components/layout/MobileNav'
+import MiniCart from './components/cart/MiniCart'
 import useStore from './store/useStore'
 import LoginModal from './components/auth/LoginModal'
 import RegisterModal from './components/auth/RegisterModal'
-import { searchAndRecommendProducts } from './utils/helpers'
+import { searchAndRecommendProducts, formatPrice } from './utils/helpers'
 import { products } from './utils/mockData'
 import './App.css'
 
@@ -20,6 +21,7 @@ const OrderTracking = lazy(() => import('./pages/OrderTracking'))
 const Profile = lazy(() => import('./pages/Profile'))
 const Wishlist = lazy(() => import('./pages/Wishlist'))
 const About = lazy(() => import('./pages/About'))
+const FAQ = lazy(() => import('./pages/FAQ'))
 
 const Header = () => {
   const { getCartCount } = useStore()
@@ -27,11 +29,15 @@ const Header = () => {
   const cartCount = getCartCount()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [cartOpen, setCartOpen] = useState(false)
 
   const navLinkClass = ({ isActive }) =>
     `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
       isActive ? 'bg-primary-50 text-primary-700' : 'text-text-secondary hover:text-text-primary'
     }`
+
+  // Reusable class for non-NavLink buttons in the header so className is always a string
+  const iconButtonClass = 'px-3 py-2 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary transition-colors'
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -68,17 +74,18 @@ const Header = () => {
             <NavLink to="/" className={navLinkClass}>Home</NavLink>
             <NavLink to="/products" className={navLinkClass}>Products</NavLink>
             <NavLink to="/wishlist" className={navLinkClass}>Wishlist</NavLink>
+            <NavLink to="/faq" className={navLinkClass}>FAQ</NavLink>
             <NavLink to="/about" className={navLinkClass}>About</NavLink>
           </nav>
 
-          <form onSubmit={handleSearch} className="hidden lg:flex items-center flex-1 max-w-md mx-4">
+          <form onSubmit={handleSearch} className="hidden lg:flex items-center flex-1 max-w-xl mx-4">
             <div className="relative w-full">
               <input
                 type="search"
-                placeholder="Search products..."
+                placeholder="Search products, brands, or categories..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-2 pr-10 rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
+                className="w-full px-4 py-2.5 pr-10 rounded-lg border-2 border-gray-200 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-200 text-sm transition-all"
                 aria-label="Search products"
               />
               <button
@@ -86,13 +93,14 @@ const Header = () => {
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-primary-600 transition-colors"
                 aria-label="Search"
               >
-                <Search className="w-4 h-4" aria-hidden="true" />
+                <Search className="w-5 h-5" aria-hidden="true" />
               </button>
 
               {/* Search Suggestions Dropdown */}
               {searchSuggestions.length > 0 && (
                 <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-border rounded-lg shadow-lg z-50">
-                  <div className="py-2 max-h-80 overflow-y-auto">
+                  <div className="py-2 max-h-96 overflow-y-auto">
+                    <p className="px-4 py-1 text-xs font-semibold text-text-secondary uppercase">Suggestions</p>
                     {searchSuggestions.map((product) => (
                       <button
                         key={product.id}
@@ -114,7 +122,7 @@ const Header = () => {
                           <p className="text-xs text-text-secondary">{product.category}</p>
                         </div>
                         <span className="text-sm font-semibold text-primary-600 flex-shrink-0">
-                          ${product.price}
+                          {formatPrice(product.price)}
                         </span>
                       </button>
                     ))}
@@ -128,16 +136,24 @@ const Header = () => {
             <NavLink to="/wishlist" className={navLinkClass} aria-label="Wishlist">
               <Heart className="w-5 h-5" aria-hidden="true" />
             </NavLink>
-            <NavLink to="/cart" className={navLinkClass} aria-label="Cart">
-              <div className="relative">
-                <ShoppingCart className="w-5 h-5" aria-hidden="true" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-primary-600 text-white text-[10px] font-semibold rounded-full px-1.5 py-0.5">
-                    {cartCount}
-                  </span>
-                )}
-              </div>
-            </NavLink>
+            <div className="relative">
+              <button
+                onClick={() => setCartOpen(!cartOpen)}
+                className={iconButtonClass}
+                aria-label="Cart"
+                aria-expanded={cartOpen}
+              >
+                <div className="relative">
+                  <ShoppingCart className="w-5 h-5" aria-hidden="true" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-primary-600 text-white text-[10px] font-semibold rounded-full px-1.5 py-0.5">
+                      {cartCount}
+                    </span>
+                  )}
+                </div>
+              </button>
+              <MiniCart isOpen={cartOpen} onClose={() => setCartOpen(false)} />
+            </div>
             <NavLink to="/profile" className={navLinkClass} aria-label="Profile">
               <User className="w-5 h-5" aria-hidden="true" />
             </NavLink>
@@ -199,7 +215,7 @@ const Header = () => {
                             <p className="text-xs text-text-secondary">{product.category}</p>
                           </div>
                           <span className="text-sm font-semibold text-primary-600 flex-shrink-0">
-                            ${product.price}
+                            {formatPrice(product.price)}
                           </span>
                         </button>
                       ))}
@@ -212,6 +228,7 @@ const Header = () => {
               <NavLink to="/" className={navLinkClass} onClick={() => setMobileOpen(false)}>Home</NavLink>
               <NavLink to="/products" className={navLinkClass} onClick={() => setMobileOpen(false)}>Products</NavLink>
               <NavLink to="/wishlist" className={navLinkClass} onClick={() => setMobileOpen(false)}>Wishlist</NavLink>
+              <NavLink to="/faq" className={navLinkClass} onClick={() => setMobileOpen(false)}>FAQ</NavLink>
               <NavLink to="/about" className={navLinkClass} onClick={() => setMobileOpen(false)}>About</NavLink>
             </nav>
           </div>
@@ -228,7 +245,7 @@ const App = () => {
     <div className="min-h-screen flex flex-col">
       <div className="h-12 w-full bg-gradient-to-r from-primary-600 via-primary-500 to-amber-400 text-white text-sm font-medium flex items-center justify-center gap-2">
         <Sparkles className="w-4 h-4" aria-hidden="true" />
-        Holiday drop: free 2-day shipping on orders over $99
+        Holiday drop: free 2-day shipping on orders over ₹2,499
       </div>
       <Header />
 
@@ -247,6 +264,7 @@ const App = () => {
               <Route path="/products" element={<ProductListing />} />
               <Route path="/products/:id" element={<ProductDetails />} />
               <Route path="/about" element={<About />} />
+              <Route path="/faq" element={<FAQ />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/orders/:orderId" element={<OrderTracking />} />

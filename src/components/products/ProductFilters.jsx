@@ -4,10 +4,10 @@ import Button from '../common/Button'
 
 const ProductFilters = ({ filters, onFilterChange, onClearFilters }) => {
   const priceRanges = [
-    { label: 'Under $50', min: 0, max: 50 },
-    { label: '$50 - $100', min: 50, max: 100 },
-    { label: '$100 - $300', min: 100, max: 300 },
-    { label: 'Over $300', min: 300, max: 10000 },
+    { label: 'Under ₹500', min: 0, max: 500 },
+    { label: '₹500 - ₹1,000', min: 500, max: 1000 },
+    { label: '₹1,000 - ₹2,500', min: 1000, max: 2500 },
+    { label: 'Over ₹2,500', min: 2500, max: 10000 },
   ]
   
   const sortOptions = [

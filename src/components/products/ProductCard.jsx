@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ShoppingCart, Heart, Star } from 'lucide-react'
+import toast from 'react-hot-toast'
 import useStore from '../../store/useStore'
 import { formatPrice, calculateDiscount } from '../../utils/helpers'
 import Button from '../common/Button'
@@ -13,14 +14,17 @@ const ProductCard = ({ product }) => {
   const handleAddToCart = (e) => {
     e.preventDefault()
     addToCart(product)
+    toast.success('Added to cart')
   }
   
   const handleToggleWishlist = (e) => {
     e.preventDefault()
     if (isWishlisted) {
       removeFromWishlist(product.id)
+      toast.success('Removed from wishlist')
     } else {
       addToWishlist(product)
+      toast.success('Saved to wishlist')
     }
   }
   
@@ -48,6 +52,7 @@ const ProductCard = ({ product }) => {
           
           {/* Wishlist Button */}
           <button
+            type="button"
             onClick={handleToggleWishlist}
             className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md hover:bg-red-50 transition-colors"
             aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}

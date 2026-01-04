@@ -18,10 +18,10 @@ const Footer = () => {
       { label: 'Cart', to: '/cart' },
     ],
     help: [
-      { label: 'Customer Service', to: '#' },
+      { label: 'Customer Service', to: '/faq' },
       { label: 'Track Order', to: '/orders/ORD-2024-001' },
-      { label: 'Returns', to: '#' },
-      { label: 'FAQs', to: '#' },
+      { label: 'Returns', to: '/faq' },
+      { label: 'FAQs', to: '/faq' },
     ]
   }
   
@@ -43,18 +43,18 @@ const Footer = () => {
                 className="flex items-center gap-2 text-text-secondary hover:text-primary-600 transition-colors"
               >
                 <Mail className="w-4 h-4" aria-hidden="true" />
-                <span className="text-sm">support@marketplace.com</span>
+                <span className="text-sm">hanumanthuadiseshu@gmail.com</span>
               </a>
               <a 
                 href="tel:+1234567890"
                 className="flex items-center gap-2 text-text-secondary hover:text-primary-600 transition-colors"
               >
                 <Phone className="w-4 h-4" aria-hidden="true" />
-                <span className="text-sm">+1 (234) 567-890</span>
+                <span className="text-sm">+91 8019199799</span>
               </a>
               <div className="flex items-center gap-2 text-text-secondary">
                 <MapPin className="w-4 h-4" aria-hidden="true" />
-                <span className="text-sm">123 Market St, City, ST 12345</span>
+                <span className="text-sm">Bhimavaram, Andhra Pradesh, India</span>
               </div>
             </div>
           </div>

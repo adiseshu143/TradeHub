@@ -33,19 +33,38 @@ export const useAuth = () => {
 
   // Initialize auth state listener
   useEffect(() => {
-    // Ensure auth persistence (remembered session)
-    initializeAuthPersistence();
+    let mounted = true;
 
-    const unsubscribe = onAuthStateChange((currentUser, isLoading) => {
-      setUser(currentUser);
-      setLoading(isLoading);
-      setError(null);
-      setAuthState(currentUser, isLoading);
-      setAuthError(null);
+    const init = async () => {
+      // Ensure auth persistence (remembered session); fallback handled inside
+      await initializeAuthPersistence();
+
+      const unsubscribe = onAuthStateChange((currentUser, isLoading) => {
+        if (!mounted) return;
+        setUser(currentUser);
+        setLoading(isLoading);
+        setError(null);
+        setAuthState(currentUser, isLoading);
+        setAuthError(null);
+      });
+
+      return unsubscribe;
+    };
+
+    let unsubscribeRef;
+    init().then((unsub) => {
+      unsubscribeRef = unsub;
+      // If auth never fires (shouldn't happen), ensure we clear loading
+      if (!mounted && typeof unsub === 'function') unsub();
     });
 
     // Cleanup listener on unmount
-    return () => unsubscribe();
+    return () => {
+      mounted = false;
+      if (typeof unsubscribeRef === 'function') {
+        unsubscribeRef();
+      }
+    };
   }, []);
 
   // Signup handler

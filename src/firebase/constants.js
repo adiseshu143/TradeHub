@@ -226,7 +226,7 @@ export const validateProduct = (productData) => {
   if (!productData.price) {
     errors.price = "Price is required";
   } else if (productData.price < VALIDATION.PRICE_MIN) {
-    errors.price = `Price must be at least $${VALIDATION.PRICE_MIN}`;
+      errors.price = `Price must be at least ₹${VALIDATION.PRICE_MIN}`;
   }
 
   if (!productData.category) {

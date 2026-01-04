@@ -1,7 +1,8 @@
-export const formatPrice = (price) => new Intl.NumberFormat('en-US', {
+export const formatPrice = (price) => new Intl.NumberFormat('en-IN', {
   style: 'currency',
-  currency: 'USD',
-  minimumFractionDigits: 2,
+  currency: 'INR',
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
 }).format(price || 0);
 
 export const calculateDiscount = (original, current) => {

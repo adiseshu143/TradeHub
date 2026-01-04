@@ -1,6 +1,7 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { ArrowRight, Shield, Truck, Headphones, Sparkles, Flame } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ArrowRight, Shield, Truck, Headphones, Sparkles, Flame, Check } from 'lucide-react'
 import ProductGrid from '../components/products/ProductGrid'
 import Button from '../components/common/Button'
 import HeroCarousel from '../components/common/HeroCarousel'
@@ -28,11 +29,62 @@ const Home = () => {
     { src: slide8, title: 'Desk details', subtitle: 'Finishing touches that keep you organized' },
   ]
 
+  const [openFeature, setOpenFeature] = useState('all')
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (openFeature === 'all') {
+        setOpenFeature(null)
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [openFeature])
+
   const features = [
-    { icon: Shield, title: 'Protected checkout', description: '3D Secure, buyer protection, easy refunds.' },
-    { icon: Truck, title: 'Express delivery', description: 'US-wide 2-day shipping on most picks.' },
-    { icon: Headphones, title: 'Human support', description: 'Real people, 24/7 chat and phone.' },
+    {
+      icon: Shield,
+      title: 'Protected checkout',
+      description: '3D Secure, buyer protection, easy refunds.',
+      details: [
+        'Bank-level security with 3D Secure on eligible cards',
+        'Purchase protection on every order',
+        'Hassle-free refunds and status updates',
+      ],
+    },
+    {
+      icon: Truck,
+      title: 'Express delivery',
+      description: 'US-wide 2-day shipping on most picks.',
+      details: [
+        'Fast dispatch from regional hubs',
+        'Real-time tracking from checkout to doorstep',
+        'Coverage across the continental US',
+      ],
+    },
+    {
+      icon: Headphones,
+      title: 'Human support',
+      description: 'Real people, 24/7 chat and phone.',
+      details: [
+        'Round-the-clock chat, phone, and email help',
+        'Real agents—no scripts when you need answers',
+        'Proactive updates on orders and returns',
+      ],
+    },
   ]
+
+  const handleFeatureToggle = (index) => {
+    setOpenFeature((current) => (current === index ? null : index))
+  }
+
+  const handleKeyToggle = (event, index) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      handleFeatureToggle(index)
+    }
+  }
 
   return (
     <div className="bg-bg-primary">
@@ -120,15 +172,63 @@ const Home = () => {
 
       <section className="container px-4 pb-14">
         <div className="grid md:grid-cols-3 gap-6">
-          {features.map((feature) => (
-            <div key={feature.title} className="bg-white rounded-xl p-6 shadow-card border border-border card-hover">
-              <div className="w-12 h-12 rounded-lg bg-primary-50 text-primary-700 grid place-items-center mb-4">
-                <feature.icon className="w-6 h-6" aria-hidden="true" />
+          {features.map((feature, index) => {
+            const isOpen = openFeature === index
+            return (
+              <div
+                key={feature.title}
+                className="bg-white rounded-xl shadow-card border border-border focus-within:shadow-lg transition-all duration-200 overflow-hidden"
+              >
+                <div
+                  role="button"
+                  tabIndex={0}
+                  aria-expanded={isOpen}
+                  aria-controls={`feature-panel-${index}`}
+                  onClick={() => handleFeatureToggle(index)}
+                  onKeyDown={(e) => handleKeyToggle(e, index)}
+                  className={`p-6 flex flex-col gap-3 outline-none transition-all duration-200 ${isOpen ? 'shadow-md' : ''} hover:-translate-y-0.5 hover:shadow-lg focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white cursor-pointer`}
+                >
+                  <div className="w-12 h-12 rounded-lg bg-primary-50 text-primary-700 grid place-items-center">
+                    <feature.icon className="w-6 h-6" aria-hidden="true" />
+                  </div>
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <h3 className="text-lg font-semibold text-text-primary">{feature.title}</h3>
+                      <p className="text-sm text-text-secondary leading-relaxed">{feature.description}</p>
+                    </div>
+                    <motion.span
+                      animate={{ rotate: isOpen ? 45 : 0 }}
+                      className="text-text-secondary"
+                      aria-hidden="true"
+                    >
+                      +
+                    </motion.span>
+                  </div>
+                </div>
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      id={`feature-panel-${index}`}
+                      initial={{ opacity: 0, height: 0, y: -6 }}
+                      animate={{ opacity: 1, height: 'auto', y: 0 }}
+                      exit={{ opacity: 0, height: 0, y: -6 }}
+                      transition={{ duration: 0.2 }}
+                      className="px-6 pb-5 bg-white"
+                    >
+                      <div className="border-t border-border pt-4 space-y-3">
+                        {feature.details.map((item) => (
+                          <div key={item} className="flex items-start gap-2 text-sm text-text-secondary">
+                            <Check className="w-4 h-4 text-primary-600 mt-0.5" aria-hidden="true" />
+                            <span>{item}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-              <h3 className="text-lg font-semibold text-text-primary mb-2">{feature.title}</h3>
-              <p className="text-sm text-text-secondary leading-relaxed">{feature.description}</p>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </section>
 

@@ -14,6 +14,8 @@ import {
   onAuthStateChanged,
   setPersistence,
   browserLocalPersistence,
+  browserSessionPersistence,
+  inMemoryPersistence,
 } from "firebase/auth";
 import { auth } from "./firebaseConfig";
 import { createUserProfile } from "./firestoreService";
@@ -32,6 +34,12 @@ const authErrorMessages = {
     "This email is already associated with another account.",
   "auth/operation-not-allowed": "Authentication is not enabled. Please contact support.",
   "auth/network-request-failed": "Network error. Please check your internet connection.",
+    "auth/invalid-credential": "Email or password is incorrect. Please try again or reset your password.",
+    "auth/invalid-login-credentials": "Email or password is incorrect. Please try again or reset your password.",
+  "auth/invalid-api-key": "Invalid Firebase API key. Please check environment variables.",
+  "auth/app-not-authorized": "This app is not authorized with Firebase. Verify project settings and API key.",
+  "auth/configuration-not-found": "Firebase project configuration is missing. Check your .env values.",
+  "auth/invalid-input": "Please provide a valid email and password.",
 };
 
 /**
@@ -50,8 +58,24 @@ export const getAuthErrorMessage = (errorCode) => {
 export const initializeAuthPersistence = async () => {
   try {
     await setPersistence(auth, browserLocalPersistence);
+    return "local";
   } catch (error) {
-    console.error("Failed to set auth persistence:", error);
+    console.warn("Local persistence unavailable, falling back to session:", error);
+  }
+
+  try {
+    await setPersistence(auth, browserSessionPersistence);
+    return "session";
+  } catch (error) {
+    console.warn("Session persistence unavailable, falling back to in-memory:", error);
+  }
+
+  try {
+    await setPersistence(auth, inMemoryPersistence);
+    return "memory";
+  } catch (error) {
+    console.error("Failed to set any auth persistence:", error);
+    return null;
   }
 };
 
@@ -147,6 +171,7 @@ export const login = async (email, password) => {
       success: true,
     };
   } catch (error) {
+    console.error("Firebase login failed", error);
     return {
       success: false,
       error: getAuthErrorMessage(error.code || error.message),
